@@ -12,7 +12,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{A1801B09-3361-1E6A-ED7C-DDF8CCAA691A}</ProjectGuid>
+    <ProjectGuid>{FF6D7FF4-B36D-61B7-55B3-AF8C9E819010}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -60,38 +60,39 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Console.cs" />
      <Compile Include="Assets\Scripts\FirebaseController.cs" />
+     <Compile Include="Assets\Scripts\GameController.cs" />
      <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
      <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-auth-unity\maven-metadata.xml" />
      <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-database-unity\maven-metadata.xml" />
  <Reference Include="Unity.Timeline.Editor">
- <HintPath>C:/Repository/Firebase/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+ <HintPath>C:/Repository/FB/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.VSCode.Editor">
- <HintPath>C:/Repository/Firebase/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ <HintPath>C:/Repository/FB/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>C:/Repository/Firebase/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ <HintPath>C:/Repository/FB/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>C:/Repository/Firebase/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+ <HintPath>C:/Repository/FB/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline">
- <HintPath>C:/Repository/Firebase/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+ <HintPath>C:/Repository/FB/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
  </Reference>
  <Reference Include="Unity.CollabProxy.Editor">
- <HintPath>C:/Repository/Firebase/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+ <HintPath>C:/Repository/FB/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Rider.Editor">
- <HintPath>C:/Repository/Firebase/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+ <HintPath>C:/Repository/FB/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.2D.Sprite.Editor">
- <HintPath>C:/Repository/Firebase/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
+ <HintPath>C:/Repository/FB/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro">
- <HintPath>C:/Repository/Firebase/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ <HintPath>C:/Repository/FB/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.UI">
- <HintPath>C:/Repository/Firebase/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ <HintPath>C:/Repository/FB/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.3f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -265,28 +266,28 @@
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.3f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
  </Reference>
  <Reference Include="Firebase.App">
- <HintPath>C:/Repository/Firebase/Assets/Firebase/Plugins/Firebase.App.dll</HintPath>
+ <HintPath>C:/Repository/FB/Assets/Firebase/Plugins/Firebase.App.dll</HintPath>
  </Reference>
  <Reference Include="Firebase.Auth">
- <HintPath>C:/Repository/Firebase/Assets/Firebase/Plugins/Firebase.Auth.dll</HintPath>
+ <HintPath>C:/Repository/FB/Assets/Firebase/Plugins/Firebase.Auth.dll</HintPath>
  </Reference>
  <Reference Include="Firebase.Database">
- <HintPath>C:/Repository/Firebase/Assets/Firebase/Plugins/Firebase.Database.dll</HintPath>
+ <HintPath>C:/Repository/FB/Assets/Firebase/Plugins/Firebase.Database.dll</HintPath>
  </Reference>
  <Reference Include="Firebase.Platform">
- <HintPath>C:/Repository/Firebase/Assets/Firebase/Plugins/Firebase.Platform.dll</HintPath>
+ <HintPath>C:/Repository/FB/Assets/Firebase/Plugins/Firebase.Platform.dll</HintPath>
  </Reference>
  <Reference Include="Firebase.TaskExtension">
- <HintPath>C:/Repository/Firebase/Assets/Firebase/Plugins/Firebase.TaskExtension.dll</HintPath>
+ <HintPath>C:/Repository/FB/Assets/Firebase/Plugins/Firebase.TaskExtension.dll</HintPath>
  </Reference>
  <Reference Include="Google.MiniJson">
- <HintPath>C:/Repository/Firebase/Assets/Firebase/Plugins/Google.MiniJson.dll</HintPath>
+ <HintPath>C:/Repository/FB/Assets/Firebase/Plugins/Google.MiniJson.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Compat">
- <HintPath>C:/Repository/Firebase/Assets/Parse/Plugins/dotNet45/Unity.Compat.dll</HintPath>
+ <HintPath>C:/Repository/FB/Assets/Parse/Plugins/dotNet45/Unity.Compat.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Tasks">
- <HintPath>C:/Repository/Firebase/Assets/Parse/Plugins/dotNet45/Unity.Tasks.dll</HintPath>
+ <HintPath>C:/Repository/FB/Assets/Parse/Plugins/dotNet45/Unity.Tasks.dll</HintPath>
  </Reference>
  <Reference Include="mscorlib">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.3f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>

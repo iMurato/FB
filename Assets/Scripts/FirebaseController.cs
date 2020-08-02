@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Firebase;
 using Firebase.Database;
 using Firebase.Unity.Editor;
@@ -9,7 +10,6 @@ public class FirebaseController : MonoBehaviour
     [SerializeField] private string Link;
     [SerializeField] private string _PrettyTextPlayer;
     [SerializeField] private string _PrettyTextRoom;
-    [SerializeField] private int ReConnectTime;
     [SerializeField] private int _KeyNumberCount;
     [SerializeField] private int _RoomCapacity;
     
@@ -22,16 +22,19 @@ public class FirebaseController : MonoBehaviour
 
     public static string MyName = "";
     public static string MyRoom = "";
+    
+    public static Dictionary<string, string> MyData = new Dictionary<string, string>(); 
 
     private static string PrettyTextPlayer;
     private static string PrettyTextRoom;
     private static int KeyNumberCount;
     private static int RoomCapacity;
 
-    private static int OnLobbyChangeCallCount = 0;
-    private static int OnRoomChangeCallCount = 0;
+    public static bool OnCheck;
+    public static bool OnConnect;
+    public static bool OnReady;
     
-    private int OnPauseCallCount = 0;
+    private static bool OnLobbySkip;
 
     private void Awake()
     {
@@ -39,21 +42,31 @@ public class FirebaseController : MonoBehaviour
         PrettyTextRoom = _PrettyTextRoom;
         KeyNumberCount = _KeyNumberCount;
         RoomCapacity = _RoomCapacity;
-
-        Check();
-    }
-
-    private void Check()
-    {
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => 
+        
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(Task => 
         {
-            if (task.Result != DependencyStatus.Available){ Invoke("Check", ReConnectTime); return; }
+            if (Task.Result != DependencyStatus.Available) return;
             
             BaseApp = FirebaseApp.DefaultInstance;
             BaseApp.SetEditorDatabaseUrl(Link);
-            BaseReference = FirebaseDatabase.DefaultInstance.RootReference;
             
-            Connect();
+            FirebaseDatabase.DefaultInstance.GetReference(".info/connected").ValueChanged += CheckConnect;
+
+            void CheckConnect(object Sender, ValueChangedEventArgs Argument)
+            {
+                if (Argument.Snapshot.Value.ToString() != "True")
+                {
+                    OnConnect = false;
+                }
+                else
+                {
+                    OnConnect = true;
+                }
+            }
+
+            BaseReference = FirebaseDatabase.DefaultInstance.RootReference;
+
+            OnCheck = true;
         });
     }
     
@@ -97,7 +110,7 @@ public class FirebaseController : MonoBehaviour
     {
         BaseReference.GetValueAsync().ContinueWith(Task =>
         {
-            if (!Task.IsCompleted) return;
+            if (Task.IsFaulted) return;
                 
             DataSnapshot ActivePlayer = Task.Result.Child("ActivePlayer");
             DataSnapshot ActiveRoom = Task.Result.Child("ActivePlayer");
@@ -113,8 +126,11 @@ public class FirebaseController : MonoBehaviour
                 }
                 
                 Debug.Log(MyName);
-                
-                BaseReference.Child("ActivePlayer").Child(MyName).SetValueAsync(0);
+
+                foreach (KeyValuePair<string, string> Data in MyData)
+                {
+                    BaseReference.Child("ActivePlayer").Child(MyName).Child(Data.Key).SetValueAsync(Data.Value);
+                }
             }
 
             if (Lobby.Children.Count() + 1 >= RoomCapacity)
@@ -141,34 +157,71 @@ public class FirebaseController : MonoBehaviour
 
     private static void OnLobbyChange(object Sender, ValueChangedEventArgs Argument)
     {
-        if (OnLobbyChangeCallCount > 0)
+        if (OnLobbySkip && !(Argument.Snapshot.Value != null))
         {
-            if (Argument.Snapshot.Value != null)
-            {
-                return;
-            }
-            else
-            {
-                BaseTracking.ValueChanged -= OnLobbyChange;
-                BaseTracking = BaseReference.Child("ActiveRoom");
-                BaseTracking.ValueChanged += OnRoomChange;
-                
-                OnLobbyChangeCallCount = 0;
-            }
+            BaseTracking.ValueChanged -= OnLobbyChange;
+            BaseTracking = BaseReference.Child("ActiveRoom");
+            BaseTracking.ValueChanged += OnActiveRoomChange;
+
+            OnLobbySkip = false;
         }
-        else
+        else if (!OnLobbySkip)
         {
-            BaseTracking.SetValueAsync(0);
+            foreach (KeyValuePair<string, string> Data in MyData)
+            {
+                BaseTracking.Child(Data.Key).SetValueAsync(Data.Value);
+            }
             
-            OnLobbyChangeCallCount++;
+            OnLobbySkip = true;
         }
     }
-    
-    private static void OnRoomChange(object Sender, ValueChangedEventArgs Argument)
+
+    private static void OnActiveRoomChange(object Sender, ValueChangedEventArgs Argument)
     {
+        string Search(DataSnapshot Snapshot, string Key)
+        {
+            string Room = "";
+                        
+            foreach (DataSnapshot Child in Snapshot.Children)
+            {
+                if (Child.Key != Key)
+                {
+                    Room = Search(Child, Key);
+
+                    if (Room != "")
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    Room = Snapshot.Key;
+                    
+                    break;
+                }
+            }
+
+            return Room;
+        }
+
+        DataSnapshot ActiveRoom = Argument.Snapshot;
+        MyRoom = Search(ActiveRoom, MyName);
+
         if (MyRoom != "")
         {
-            if (OnRoomChangeCallCount > 0)
+            Debug.Log(MyRoom);
+
+            BaseTracking.ValueChanged -= OnActiveRoomChange;
+            BaseTracking = BaseReference.Child("ActiveRoom").Child(MyRoom);
+            BaseTracking.ValueChanged += OnRoomChange;
+        }
+    }
+
+    private static void OnRoomChange(object Sender, ValueChangedEventArgs Argument)
+    {
+        if (Argument.Snapshot.Children.Any())
+        {
+            if (OnReady)
             {
                 if (Argument.Snapshot.Children.Count() < RoomCapacity)
                 {
@@ -179,70 +232,36 @@ public class FirebaseController : MonoBehaviour
                     Debug.Log("React.");
                 }
             }
-            else
+            else if (!(Argument.Snapshot.Children.Count() != RoomCapacity))
             {
-                if (!(Argument.Snapshot.Children.Count() != RoomCapacity))
-                {
-                    OnRoomChangeCallCount++;
-                }
-                else if (!Argument.Snapshot.Children.Any())
-                {
-                    BaseReference.Child("Lobby").GetValueAsync().ContinueWith(Task =>
-                    {
-                        if (!Task.IsCompleted) return;
-                    
-                        BaseReference.Child("ActiveRoom").Child(MyRoom).Child(MyName).SetValueAsync(0);
-                    
-                        for (int i = 1; i < RoomCapacity; i++)
-                        {
-                            string LastPlayer = Task.Result.Children.ElementAt(Task.Result.Children.Count() - i).Key;
-                        
-                            BaseReference.Child("Lobby").Child(LastPlayer).SetValueAsync(null);
-                            BaseReference.Child("ActiveRoom").Child(MyRoom).Child(LastPlayer).SetValueAsync(0);
-                        }
-                    });
-                }
+                OnReady = true;
             }
         }
         else
         {
-            string Search(DataSnapshot Snapshot, string Key)
+            BaseReference.Child("Lobby").GetValueAsync().ContinueWith(Task =>
             {
-                string Room = "";
-                        
-                foreach (DataSnapshot Child in Snapshot.Children)
+                if (Task.IsFaulted) return;
+                
+                DataSnapshot Lobby = Task.Result;
+                
+                foreach (KeyValuePair<string, string> Data in MyData)
                 {
-                    if (Child.Key != Key)
-                    {
-                        Room = Search(Child, Key);
-
-                        if (Room != "")
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        Room = Snapshot.Key;
-                    
-                        break;
-                    }
+                    BaseTracking.Child(MyName).Child(Data.Key).SetValueAsync(Data.Value);
                 }
 
-                return Room;
-            }
-
-            DataSnapshot ActiveRoom = Argument.Snapshot;
-            MyRoom = Search(ActiveRoom, MyName);
-
-            if (MyRoom != "")
-            {
-                Debug.Log(MyRoom);
-
-                BaseTracking.ValueChanged -= OnRoomChange;
-                BaseTracking = BaseReference.Child("ActiveRoom").Child(MyRoom);
-                BaseTracking.ValueChanged += OnRoomChange;
-            }
+                for (int i = 1; i < RoomCapacity; i++)
+                {
+                    string LastPlayer = Lobby.Children.ElementAt(Lobby.Children.Count() - i).Key;
+                    
+                    foreach (DataSnapshot Data in Lobby.Child(LastPlayer).Children)
+                    {
+                        BaseTracking.Child(LastPlayer).Child(Data.Key).SetValueAsync(Data.Value);
+                    }
+                        
+                    BaseReference.Child("Lobby").Child(LastPlayer).SetValueAsync(null);
+                }
+            });
         }
     }
 
@@ -258,8 +277,6 @@ public class FirebaseController : MonoBehaviour
                 }
                 
                 BaseReference.Child("ActiveRoom").Child(MyRoom).Child(MyName).SetValueAsync(null);
-
-                OnRoomChangeCallCount = 0;
                 
                 MyRoom = "";
             }
@@ -268,39 +285,17 @@ public class FirebaseController : MonoBehaviour
                 if (BaseTracking != null)
                 {
                     BaseTracking.ValueChanged -= OnLobbyChange;
+                    BaseTracking.ValueChanged -= OnActiveRoomChange;
                 }
 
                 BaseReference.Child("Lobby").Child(MyName).SetValueAsync(null);
-
-                OnLobbyChangeCallCount = 0;
             }
+            
+            OnReady = false;
             
             BaseReference.Child("ActivePlayer").Child(MyName).SetValueAsync(null);
 
             MyName = "";
         }
     }
-    
-    #if UNITY_EDITOR
-
-        private void OnApplicationQuit()
-        {
-            Disconnect();
-        }
-
-    #else
-    
-        private void OnApplicationPause(bool OnPause)
-        {
-            if (OnPauseCallCount > 0 && OnPause)
-            {
-                Disconnect();
-            }
-            else
-            {
-                OnPauseCallCount++;
-            }
-        }
-    
-    #endif
 }

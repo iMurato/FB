@@ -3,14 +3,17 @@ ScriptsOnlyBuild:
     Assembly-CSharp.dll:
     - Console
     - FirebaseController
+    - GameController
     Unity.Rider.Editor.dll:
     - Packages.Rider.Editor.RiderScriptEditorData
     - Packages.Rider.Editor.UnitTesting.CallbackData
     UnityEditor.Graphs.dll:
     - UnityEditor.Graphs.AnimationBlendTree.Graph
     - UnityEditor.Graphs.AnimationBlendTree.GraphGUI
+    - UnityEditor.Graphs.AnimationStateMachine.AnyStateNode
     - UnityEditor.Graphs.AnimationStateMachine.Graph
     - UnityEditor.Graphs.AnimationStateMachine.GraphGUI
+    - UnityEditor.Graphs.AnimationStateMachine.StateNode
     - UnityEditor.Graphs.AnimatorControllerTool
     UnityEditor.TestRunner.dll:
     - UnityEditor.TestTools.TestRunner.Api.CallbacksHolder
@@ -37,6 +40,8 @@ ScriptsOnlyBuild:
     - Class: 28
       Script: {instanceID: 0}
     - Class: 48
+      Script: {instanceID: 0}
+    - Class: 74
       Script: {instanceID: 0}
     - Class: 81
       Script: {instanceID: 0}
@@ -66,6 +71,8 @@ ScriptsOnlyBuild:
       Script: {instanceID: 13324}
     - Class: 114
       Script: {instanceID: 13364}
+    - Class: 114
+      Script: {instanceID: 14178}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -527,6 +534,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: PlayableTrack
+  - hash:
+      serializedVersion: 2
+      Hash: b2660567325f2191a45d05a61e7e4f9c
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: GameController
   platform: 13
   scenePathNames:
   - Assets/Scenes/Main.unity
